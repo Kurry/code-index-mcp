@@ -15,6 +15,33 @@ Code Index MCP is a Model Context Protocol server that enables large language mo
 
 This project uses uv for environment management and dependency installation.
 
+### Automatic Installation
+
+For easy installation and setup with Claude for Mac/Windows and Cursor:
+
+**macOS/Linux:**
+```bash
+# Clone the repository (if you haven't already)
+git clone https://github.com/your-username/code-index-mcp.git
+cd code-index-mcp
+
+# Run the installer (with an optional directory to pre-index)
+chmod +x install.sh
+./install.sh --index /path/to/your/project
+```
+
+**Windows:**
+```powershell
+# Clone the repository (if you haven't already)
+git clone https://github.com/your-username/code-index-mcp.git
+cd code-index-mcp
+
+# Run the installer (with an optional directory to pre-index)
+PowerShell -ExecutionPolicy Bypass -File .\install.ps1 -i "C:\path\to\your\project"
+```
+
+### Manual Installation
+
 1. Ensure you have Python 3.10 or later installed
 2. Install uv (recommended):
 
@@ -30,6 +57,11 @@ This project uses uv for environment management and dependency installation.
    # Clone the repository
    git clone https://github.com/your-username/code-index-mcp.git
    ```
+4. Install the package:
+   ```bash
+   cd code-index-mcp
+   uv pip install -e .
+   ```
 
 ## Usage
 
@@ -38,6 +70,9 @@ This project uses uv for environment management and dependency installation.
 ```bash
 # Run directly with uv - no additional dependency installation needed
 uv run run.py
+
+# Or pre-index a directory on startup
+uv run run.py --index /path/to/project
 ```
 
 UV will automatically handle all dependency installations based on the project's configuration.
@@ -46,7 +81,7 @@ UV will automatically handle all dependency installations based on the project's
 
 You can easily integrate Code Index MCP with Claude Desktop:
 
-1. Ensure you have UV installed (see installation section above)
+1. Ensure you have UV installed and the package is installed (see installation section above)
 2. Find or create the Claude Desktop configuration file:
 
    - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
@@ -59,12 +94,9 @@ You can easily integrate Code Index MCP with Claude Desktop:
    {
      "mcpServers": {
        "code-indexer": {
-         "command": "uv",
+         "command": "uvx",
          "args": [
-            "--directory",
-            "C:\\Users\\username\\path\\to\\code-index-mcp",
-            "run",
-            "run.py"
+            "C:\\Users\\username\\path\\to\\code-index-mcp"
           ]
        }
      }
@@ -77,20 +109,29 @@ You can easily integrate Code Index MCP with Claude Desktop:
    {
      "mcpServers": {
        "code-indexer": {
-         "command": "uv",
+         "command": "uvx",
          "args": [
-            "--directory",
-            "/home/username/path/to/code-index-mcp",
-            "run",
-            "run.py"
+            "/Users/username/path/to/code-index-mcp"
           ]
        }
      }
    }
    ```
 
-   **Note**: The `--directory` option is important as it ensures uv runs in the correct project directory and can properly load all dependencies.
+   **Note**: The automatic installation scripts will handle this configuration for you.
+
 4. Restart Claude Desktop to use Code Indexer for analyzing code projects
+
+#### Integrating with Cursor
+
+The integration with Cursor works similarly:
+
+1. Find or create the Cursor MCP configuration file:
+
+   - Windows: `%APPDATA%\Cursor\mcp_config.json`
+   - macOS/Linux: `~/Library/Application Support/Cursor/mcp_config.json`
+
+2. Add the same configuration as for Claude Desktop (the automatic installation scripts will handle this for you)
 
 No manual dependency installation is required - UV will automatically handle all dependencies when running the server.
 

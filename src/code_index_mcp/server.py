@@ -12,6 +12,7 @@ import pathlib
 import json
 import fnmatch
 import sys
+import argparse
 from mcp.server.fastmcp import FastMCP, Context, Image
 from mcp import types
 
@@ -691,6 +692,46 @@ def _get_all_files(directory: Dict, prefix: str = "") -> List[Tuple[str, Dict]]:
 
 def main():
     """Entry point for the code indexer."""
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description="Code Index MCP Server")
+    parser.add_argument(
+        "--index", "-i", 
+        dest="index_path", 
+        help="Directory path to pre-index on startup"
+    )
+    args = parser.parse_args()
+    
+    if args.index_path:
+        index_path = os.path.abspath(args.index_path)
+        if os.path.isdir(index_path):
+            print(f"Pre-indexing directory: {index_path}", file=sys.stderr)
+            
+            # Create and initialize settings for this path
+            settings = ProjectSettings(index_path)
+            
+            # Initialize the global index
+            global file_index, code_content_cache
+            file_index.clear()
+            code_content_cache.clear()
+            
+            # Index the project
+            file_count = _index_project(index_path)
+            print(f"Indexed {file_count} files", file=sys.stderr)
+            
+            # Save the new index and update config
+            settings.save_index(file_index)
+            config = {
+                "base_path": index_path,
+                "supported_extensions": supported_extensions,
+                "last_indexed": settings._get_timestamp()
+            }
+            settings.save_config(config)
+            
+            print(f"Index saved to {settings.settings_path}", file=sys.stderr)
+        else:
+            print(f"Error: {index_path} is not a valid directory", file=sys.stderr)
+            sys.exit(1)
+    
     print("Starting Code Index MCP Server...", file=sys.stderr)
     mcp.run()
 

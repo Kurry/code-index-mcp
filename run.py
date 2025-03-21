@@ -16,6 +16,7 @@ try:
     if __name__ == "__main__":
         print("Starting Code Index MCP server...", file=sys.stderr)
         print(f"Added path: {src_path}", file=sys.stderr)
+        # Pass through all arguments to the main function
         main()
 except ImportError as e:
     print(f"Import Error: {e}", file=sys.stderr)
