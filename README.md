@@ -118,7 +118,9 @@ You can easily integrate Code Index MCP with Claude Desktop:
    }
    ```
 
-   **Note**: The automatic installation scripts will handle this configuration for you.
+   **Note**: 
+   - The automatic installation scripts will handle this configuration for you.
+   - The tool can also be run directly with `uv run run.py` which may be useful for development and debugging.
 
 4. Restart Claude Desktop to use Code Indexer for analyzing code projects
 
