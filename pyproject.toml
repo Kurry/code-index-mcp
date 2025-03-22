@@ -24,6 +24,7 @@ dependencies = [
     "fastembed>=0.2.0",
     "openai-agents",
     "inflection",
+    "pandas",
 ]
 
 [project.urls]

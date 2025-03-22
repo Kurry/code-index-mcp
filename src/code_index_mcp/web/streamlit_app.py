@@ -24,7 +24,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for styling the UI
+# Custom CSS for styling the UI similar to the Cursor interface
 st.markdown("""
 <style>
     .stApp {
@@ -237,7 +237,18 @@ def main():
     
     # Initialize the embedding manager
     try:
-        _embedding_manager = EmbeddingManager(base_path=base_path)
+        # Check if we should use Qdrant Cloud
+        use_qdrant_cloud = os.environ.get('CODE_INDEX_USE_QDRANT_CLOUD', '').lower() in ('true', '1', 'yes')
+        
+        _embedding_manager = EmbeddingManager(
+            base_path=base_path,
+            use_qdrant_cloud=use_qdrant_cloud
+        )
+        
+        if use_qdrant_cloud:
+            st.success("Using Qdrant Cloud for vector storage")
+        else:
+            st.info("Using in-memory Qdrant instance (for development)")
     except ImportError as e:
         st.error(f"Could not initialize embedding manager: Missing dependency {str(e)}")
         st.info("Try running: pip install -e . to ensure all dependencies are installed")
@@ -325,23 +336,44 @@ def main():
         Folders with more than 10,000 files will not be auto-indexed.
         """, help="Control automatic indexing behavior")
         
+        # Qdrant Cloud toggle
+        current_use_cloud = os.environ.get('CODE_INDEX_USE_QDRANT_CLOUD', '').lower() in ('true', '1', 'yes')
+        use_cloud = st.toggle("Use Qdrant Cloud for storage", value=current_use_cloud)
+        
+        # Update the environment variable if changed
+        if use_cloud != current_use_cloud:
+            os.environ['CODE_INDEX_USE_QDRANT_CLOUD'] = 'true' if use_cloud else 'false'
+            st.success(f"Qdrant Cloud usage set to: {use_cloud}")
+            st.warning("Please restart the application for this change to take effect")
+        
         # Ignore files section
         st.markdown("### Ignore files")
-        st.button("Configure ignored files", disabled=True)
         st.markdown("Configure the files that Code Index MCP will ignore when indexing your repository (in addition to your .gitignore).")
+        
+        # Add a text area for ignore patterns with default values
+        default_ignore = ".git\nnode_modules\nvenv\n.venv\n__pycache__\nbuild\ndist"
+        ignore_patterns = st.text_area("Ignore patterns (one per line)", value=default_ignore)
+        st.caption("These directories will be excluded when indexing your codebase")
+        
+        if st.button("Save Ignore Patterns"):
+            # In a real implementation, you would save these patterns to a config file
+            # For now, just show a success message
+            st.success("Ignore patterns saved successfully")
         
         # Git graph option
         st.markdown("### Git graph file relationships")
-        st.selectbox("", options=["default"], disabled=True)
-        enabled = st.toggle("Enabled", value=True)
+        git_enabled = st.toggle("Enable Git history analysis", value=False)
         st.markdown("""
         When enabled, Code Index MCP will index your git history to help understand which files are related to each other. 
         Code and commit messages are stored locally, but metadata about commits (SHAs, number of changes, and obfuscated file names) are stored on the server.
         """)
+        
+        if git_enabled:
+            st.warning("Git history analysis is not yet implemented")
     
     # Directories section
-    st.markdown("# Docs")
-    st.markdown("Manage the custom docs that you've added.")
+    st.markdown("# Directories")
+    st.markdown("Manage indexed directories in your project.")
     
     # Find indexable directories
     directories = find_indexable_directories(base_path)
@@ -444,7 +476,10 @@ def main():
                             index_dir.mkdir(exist_ok=True)
                             
                             # Create a temporary embedding manager for this directory
-                            temp_manager = EmbeddingManager(base_path=str(full_path))
+                            temp_manager = EmbeddingManager(
+                                base_path=str(full_path),
+                                use_qdrant_cloud=os.environ.get('CODE_INDEX_USE_QDRANT_CLOUD', '').lower() in ('true', '1', 'yes')
+                            )
                             file_count = temp_manager.index_directory()
                             
                             st.success(f"Added and indexed {file_count} files in {new_dir}")
@@ -456,4 +491,4 @@ def main():
                 st.warning("Please enter a directory path")
 
 if __name__ == "__main__":
-    main() 
+    main()

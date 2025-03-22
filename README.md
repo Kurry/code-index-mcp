@@ -39,6 +39,55 @@ Then run the components:
 python run_streamlit.py
 ```
 
+## Embedding Generation Script
+
+The project includes a script called `generate_embeddings.py` in the root directory that uses the embedding agent to generate and save embeddings.
+
+### Key Features:
+
+1. **Input/Output Directory Specification**:
+   - `--input` or `-i`: Directory containing code to process
+   - `--output` or `-o`: Directory to save embedding files
+
+2. **Testing and Verification Features**:
+   - `--dry-run` or `-d`: Runs the processing step without generating embeddings
+   - `--max-files` or `-m`: Limits the number of files to process (default: 1000)
+   - `--verbose` or `-v`: Provides detailed output for debugging
+
+3. **Configuration Options**:
+   - `--extensions` or `-e`: Specify file extensions to process
+   - `--exclude-dirs` or `-x`: Directories to exclude from processing
+   - `--chunk-size` or `-c`: Size of code chunks for granular embedding
+   - `--text-model` and `--code-model`: Specify embedding models to use
+   - `--use-qdrant-cloud` or `-q`: Use Qdrant Cloud instead of local storage
+
+4. **Output and Reporting**:
+   - Generates a timestamped embeddings file (`embeddings_TIMESTAMP.pkl`)
+   - Provides statistics on processed files and generated embeddings
+   - Reports timing information for each processing step
+
+### Usage Examples:
+
+Basic usage:
+```bash
+python generate_embeddings.py --input ./my_project --output ./embeddings
+```
+
+Dry run to test configuration:
+```bash
+python generate_embeddings.py --input ./my_project --output ./embeddings --dry-run --verbose
+```
+
+Process specific file types with limit:
+```bash
+python generate_embeddings.py --input ./my_project --output ./embeddings --max-files 100 --extensions py js ts
+```
+
+Use Qdrant Cloud with custom models:
+```bash
+python generate_embeddings.py --input ./my_project --output ./embeddings --use-qdrant-cloud --text-model text-embedding-3-large --code-model text-embedding-3-large
+```
+
 ## Project Structure
 
 The project has a clean, organized structure:
