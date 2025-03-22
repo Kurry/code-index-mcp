@@ -1,216 +1,78 @@
-# Code Index MCP
+# Code Index MCP with Qdrant Vector Search
 
-Code Index MCP is a Model Context Protocol server that enables large language models (LLMs) to index, search, and analyze code in project directories.
+A Model Context Protocol server for code indexing, searching, and analysis.
 
-## Features
+## Key Features
 
-- Index and navigate project file structures
-- Search for specific patterns in code
-- Get detailed file summaries
-- Analyze code structure and complexity
-- Support for multiple programming languages
-- Persistent storage of project settings
+- Semantic code search using dual embeddings (text and code models)
+- Natural language understanding of your codebase
+- Code-to-code similarity search
+- Real-time file change monitoring and auto-indexing
+- Web UI for easy management
+- Integration with Claude Desktop and Cursor
 
-## Installation
+## Quick Start
 
-This project uses uv for environment management and dependency installation.
-
-### Automatic Installation
-
-For easy installation and setup with Claude for Mac/Windows and Cursor:
-
-**macOS/Linux:**
-```bash
-# Clone the repository (if you haven't already)
-git clone https://github.com/your-username/code-index-mcp.git
-cd code-index-mcp
-
-# Run the installer (with an optional directory to pre-index)
-chmod +x install.sh
-./install.sh --index /path/to/your/project
-```
-
-**Windows:**
-```powershell
-# Clone the repository (if you haven't already)
-git clone https://github.com/your-username/code-index-mcp.git
-cd code-index-mcp
-
-# Run the installer (with an optional directory to pre-index)
-PowerShell -ExecutionPolicy Bypass -File .\install.ps1 -i "C:\path\to\your\project"
-```
-
-### Manual Installation
-
-1. Ensure you have Python 3.10 or later installed
-2. Install uv (recommended):
-
-   ```bash
-   # Windows
-   powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
-   # macOS/Linux
-   curl -LsSf https://astral.sh/uv/install.sh | sh
-   ```
-3. Getting the code:
-
-   ```bash
-   # Clone the repository
-   git clone https://github.com/your-username/code-index-mcp.git
-   ```
-4. Install the package:
-   ```bash
-   cd code-index-mcp
-   uv pip install -e .
-   ```
-
-## Usage
-
-### Running the Server Directly
+First, configure your project directory in the `.env` file:
 
 ```bash
-# Run directly with uv - no additional dependency installation needed
-uv run run.py
+# Copy the example .env file
+cp .env.example .env
 
-# Or pre-index a directory on startup
-uv run run.py --index /path/to/project
+# Edit the .env file and set your project directory
+echo "CODE_INDEX_DIRECTORY=/path/to/your/project" >> .env
 ```
 
-UV will automatically handle all dependency installations based on the project's configuration.
+Then run the components:
 
-### Integrating with Claude Desktop
+```bash
+# Install
+./scripts/install.sh
 
-You can easily integrate Code Index MCP with Claude Desktop:
+# Run the server with auto-indexing (Unix)
+./scripts/start_indexer.sh --auto-index
 
-1. Ensure you have UV installed and the package is installed (see installation section above)
-2. Find or create the Claude Desktop configuration file:
+# Run the server with auto-indexing (Windows)
+.\scripts\start_indexer.ps1 --auto-index
 
-   - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
-   - macOS/Linux: `~/Library/Application Support/Claude/claude_desktop_config.json`
-3. Add the following configuration (replace with your actual path):
+# Run the web interface (uses CODE_INDEX_DIRECTORY from .env)
+python run_streamlit.py
+```
 
-   **For Windows**:
+## Project Structure
 
-   ```json
-   {
-     "mcpServers": {
-       "code-indexer": {
-         "command": "uvx",
-         "args": [
-            "C:\\Users\\username\\path\\to\\code-index-mcp"
-          ]
-       }
-     }
-   }
-   ```
+The project has a clean, organized structure:
 
-   **For macOS/Linux**:
+```
+code-index-mcp/
+├── docs/                     # Documentation files
+├── scripts/                  # Helper scripts
+├── src/                      # Source code
+│   └── code_index_mcp/       # Main package
+│       ├── cli/              # Command-line interface
+│       ├── core/             # Core functionality
+│       ├── embedder/         # Embedding functionality
+│       ├── server/           # MCP server implementation
+│       └── web/              # Web UI implementation
+└── tests/                    # Unit tests
+```
 
-   ```json
-   {
-     "mcpServers": {
-       "code-indexer": {
-         "command": "uvx",
-         "args": [
-            "/Users/username/path/to/code-index-mcp"
-          ]
-       }
-     }
-   }
-   ```
+## Configuration
 
-   **Note**: 
-   - The automatic installation scripts will handle this configuration for you.
-   - The tool can also be run directly with `uv run run.py` which may be useful for development and debugging.
+All configuration is managed through environment variables or a `.env` file:
 
-4. Restart Claude Desktop to use Code Indexer for analyzing code projects
+- `CODE_INDEX_DIRECTORY`: The directory to index (required)
+- `OPEN_AI_KEY`: Your OpenAI API key for embeddings
+- `QDRANT_URL`: Qdrant Cloud URL (optional)
+- `QDRANT_API_KEY`: Qdrant Cloud API key (optional)
 
-#### Integrating with Cursor
+## Using with LLMs
 
-The integration with Cursor works similarly:
+This MCP server allows Large Language Models to:
 
-1. Find or create the Cursor MCP configuration file:
+1. Index your entire codebase with semantic understanding
+2. Search for relevant code using natural language
+3. Analyze code structure and patterns
+4. Answer questions about your code with context
 
-   - Windows: `%APPDATA%\Cursor\mcp_config.json`
-   - macOS/Linux: `~/Library/Application Support/Cursor/mcp_config.json`
-
-2. Add the same configuration as for Claude Desktop (the automatic installation scripts will handle this for you)
-
-No manual dependency installation is required - UV will automatically handle all dependencies when running the server.
-
-### Basic Workflow
-
-1. **Set Project Path** (required first step):
-
-   - When using for the first time, you must set the project path to analyze
-   - Through Claude command: "I need to analyze a project, help me set up the project path"
-   - Provide the complete project directory path
-2. **Code Search**:
-
-   - Search for specific keywords or patterns: "Search for 'function name' in the project"
-   - Filter by file type: "Search for 'import' in all .py files"
-3. **File Analysis**:
-
-   - Analyze specific files: "Analyze the file src/main.py"
-   - Get file summaries: "Give me a list of functions in utils/helpers.js"
-4. **Project Navigation**:
-
-   - View project structure: "Show me the structure of this project"
-   - Find files matching specific patterns: "Find all test_*.py files"
-
-## Technical Details
-
-### Persistent Storage
-
-All index and settings data are stored in the `.code_indexer` folder within the project directory:
-
-- `config.json`: Project configuration information
-- `file_index.pickle`: File index data
-- `content_cache.pickle`: File content cache
-
-This ensures that the entire project doesn't need to be re-indexed each time it's used.
-
-### Dependency Management with UV
-
-Code Index MCP uses UV for dependency management, which provides several advantages:
-
-- Automatic dependency resolution based on project requirements
-- Faster package installation and environment setup
-- Consistent dependency versions via the lock file
-
-### Supported File Types
-
-The following file types are currently supported for indexing and analysis:
-
-- Python (.py)
-- JavaScript/TypeScript (.js, .ts, .jsx, .tsx)
-- Java (.java)
-- C/C++ (.c, .cpp, .h, .hpp)
-- C# (.cs)
-- Go (.go)
-- Ruby (.rb)
-- PHP (.php)
-- Swift (.swift)
-- Kotlin (.kt)
-- Rust (.rs)
-- Scala (.scala)
-- Shell (.sh, .bash)
-- HTML/CSS (.html, .css, .scss)
-- Markdown (.md)
-- JSON (.json)
-- XML (.xml)
-- YAML (.yml, .yaml)
-
-## Security Considerations
-
-- File path validation prevents directory traversal attacks
-- Absolute path access is not allowed
-- Project path must be explicitly set, with no default value
-- The `.code_indexer` folder includes a `.gitignore` file to prevent indexing data from being committed
-
-## Contributing
-
-Contributions via issues or pull requests to add new features or fix bugs are welcome.
-
----
-
-*For documentation in Chinese, please see [README_zh.md](README_zh.md).*
+For complete documentation, please see the [docs/README.md](docs/README.md) file.

@@ -1,39 +1,27 @@
-# Python cache files
+# Python bytecode
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
+
+# Distribution / packaging
 *.egg-info/
-.installed.cfg
-*.egg
+dist/
+build/
 
 # Virtual environments
 venv/
 env/
-ENV/
+.env
 
 # IDE files
-.idea/
 .vscode/
+.idea/
+
+# Project specific
+.code_indexer/
+
+# Temporary files
 *.swp
 *.swo
-
-# OS specific files
+*~
 .DS_Store
-Thumbs.db
-
-# Code Index MCP specific files
-.code_indexer/

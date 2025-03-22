@@ -14,6 +14,16 @@ authors = [
 ]
 dependencies = [
     "mcp>=0.3.0",
+    "faiss-cpu",
+    "openai>=1.0.0",
+    "tenacity",
+    "numpy",
+    "watchdog",
+    "python-dotenv",
+    "qdrant-client>=1.7.0",
+    "fastembed>=0.2.0",
+    "openai-agents",
+    "inflection",
 ]
 
 [project.urls]
@@ -21,8 +31,11 @@ Homepage = "https://github.com/yourusername/code-index-mcp"
 "Bug Tracker" = "https://github.com/yourusername/code-index-mcp/issues"
 
 [project.scripts]
-code-indexer = "code_index_mcp.server:main"
-uvx = "code_index_mcp.server:main"
+code-indexer = "code_index_mcp.cli.commands:main"
+uvx = "code_index_mcp.cli.commands:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
+
+[tool.pyright]
+reportMissingImports = false

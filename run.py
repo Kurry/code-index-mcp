@@ -1,21 +1,22 @@
 #!/usr/bin/env python
 """
-Development convenience script to run the Code Index MCP server.
+Development convenience script to run the Code Index MCP server with embeddings.
 """
 import sys
 import os
 import traceback
 
-# 將 src 目錄添加到路徑
+# Add src directory to path
 src_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'src')
 sys.path.insert(0, src_path)
 
 try:
-    from code_index_mcp.server import main
+    from code_index_mcp.cli.commands import main
     
     if __name__ == "__main__":
-        print("Starting Code Index MCP server...", file=sys.stderr)
+        print("Starting Code Index MCP server with Qdrant embeddings...", file=sys.stderr)
         print(f"Added path: {src_path}", file=sys.stderr)
+        
         # Pass through all arguments to the main function
         main()
 except ImportError as e:
